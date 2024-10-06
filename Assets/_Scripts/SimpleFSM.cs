@@ -9,14 +9,17 @@ using UnityEngine.AI;
 public enum EnemySimpleFSMStates
 {
     Patrol,
+    Looking,
     Chase,
     Attack,
     FleeToHQ
 }
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class SimpleFSM : MonoBehaviour
 {
     [SerializeField] private EnemySimpleFSMStates _currentState;
+    [SerializeField] private Animator _animator;
     [SerializeField] private GameObject _player;
     [SerializeField] private NavMeshAgent _agent;
     [SerializeField] private GameObject _patrollingLocations;
@@ -35,10 +38,13 @@ public class SimpleFSM : MonoBehaviour
 
     [SerializeField] private bool _isInFront;
 
-    private int _index = 0;
+    [SerializeField] private float _walkSpeed, _runSpeed;
+
+    [SerializeField] private int _index = 0;
 
     void Start()
     {
+        _animator = GetComponent<Animator>();
         _agent = GetComponent<NavMeshAgent>();
         _currentState = EnemySimpleFSMStates.Patrol;
         _player = GameObject.FindWithTag("Player");
@@ -65,6 +71,9 @@ public class SimpleFSM : MonoBehaviour
             case EnemySimpleFSMStates.FleeToHQ:
                 Flee();
                 break;
+            case EnemySimpleFSMStates.Looking:
+                Looking();
+                break;
             default: 
                 Debug.LogError("State in FSM not implemented");
                 break;
@@ -73,46 +82,71 @@ public class SimpleFSM : MonoBehaviour
 
     private void Patrol()
     {
+        _animator.SetBool("IsWalking", true);
         Debug.Log("Patrolling...");
         Vector3 playerPosInRelationToGuard = _player.transform.position - transform.position;
         float distanceToPlayer = playerPosInRelationToGuard.magnitude;
         Vector3 directionToPlayer = playerPosInRelationToGuard / distanceToPlayer;
 
         _agent.SetDestination(_patrolPoints[_index].position);
+        _agent.speed = _walkSpeed;
 
         Vector3 destination = _patrolPoints[_index].position;
         if (Vector3.Distance(transform.position, destination) < 2f)
         {
-            _index = (_index + 1) % _patrolPoints.Count;
+            TransitionStates(EnemySimpleFSMStates.Looking);
         }
 
         _isInFront = Vector3.Dot(transform.forward, directionToPlayer) > _fieldOfView;
         if (_isInFront && distanceToPlayer < _distanceToChase)
         {
+            _animator.SetBool("IsRunning", true);
             TransitionStates(EnemySimpleFSMStates.Chase);
         }
-        if (_isInFront && distanceToPlayer < _distanceToAttack)
-        {
-            TransitionStates(EnemySimpleFSMStates.Attack);
-        }
     }
+
+    private void Looking()
+    {
+        if(!_animator.GetBool("IsLooking"))
+        {
+            StartCoroutine("LookingAround");
+        }
+        _animator.SetBool("IsLooking", true);
+    }
+
+    IEnumerator LookingAround()
+    {
+        yield return new WaitForSeconds(2f);
+        _index = (_index + 1) % _patrolPoints.Count;
+        _animator.SetBool("IsLooking", false);
+        TransitionStates(EnemySimpleFSMStates.Patrol);
+    }
+
     private void Chase()
     {
+        
         _agent.SetDestination(_player.transform.position);
+        _agent.speed = _runSpeed;
 
         if (Vector3.Distance(transform.position, _player.transform.position) > _distanceToChase)
         {
+            _animator.SetBool("IsRunning", false);
             TransitionStates(EnemySimpleFSMStates.Patrol);
         }
         if (Vector3.Distance(transform.position, _player.transform.position) < _distanceToAttack)
         {
+            _animator.SetBool("IsAttacking", true);
             TransitionStates(EnemySimpleFSMStates.Attack);
         }
         Debug.Log("CHAAAASEEEE....");
     }
     private void Attack() 
     {
-        Debug.Log("Attack....");
+        if (Vector3.Distance(transform.position, _player.transform.position) > _distanceToAttack)
+        {
+            _animator.SetBool("IsAttacking", false);
+            TransitionStates(EnemySimpleFSMStates.Chase);
+        }
     }
 
     private void Flee()
