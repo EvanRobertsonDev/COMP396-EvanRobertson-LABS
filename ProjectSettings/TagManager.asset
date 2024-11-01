@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Obstacle
+  - Start
+  - End
+  - MimicObj
   layers:
   - Default
   - TransparentFX

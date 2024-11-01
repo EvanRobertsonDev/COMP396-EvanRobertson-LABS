@@ -107,7 +107,7 @@ public class GridManager : MonoBehaviour
         return Origin + new Vector3(xPosInGrid, 0, zPosInGrid);
     }
 
-    public void GetNeighbours(Node node, ArrayList neighbours)
+    public void GetNeighbours(Node node, List<Node> neighbours)
     {
         Vector3 neighbourPosition = node.position;
         int neighbourIndex = GetGridIndex(neighbourPosition);
@@ -133,7 +133,7 @@ public class GridManager : MonoBehaviour
 
     }
 
-    void AssignNeighbour(int row, int col, ArrayList neighbours)
+    void AssignNeighbour(int row, int col, List<Node> neighbours)
     {
         if (row != -1 && col != -1 && row < NumOfRows && col < NumOfColumns)
         {

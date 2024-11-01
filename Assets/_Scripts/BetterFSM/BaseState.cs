@@ -10,6 +10,7 @@ public abstract class BaseState : IState
 
     protected static readonly int Walk = Animator.StringToHash("Walking");
     protected static readonly int Run = Animator.StringToHash("Running");
+    protected static readonly int Attack = Animator.StringToHash("Attacking");
 
     protected BaseState(NavMeshAgent agent, Animator animator)
     {

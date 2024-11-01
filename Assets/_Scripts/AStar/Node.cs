@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class Node : IComparable
+public class Node : IComparable<Node>
 {
     public float nodeTotalCost, estimateCost;
     public bool obstacle;
@@ -25,9 +25,8 @@ public class Node : IComparable
         obstacle = true;
     }
 
-    public int CompareTo(object obj)
+    public int CompareTo(Node node)
     {
-        Node node = (Node)obj;
         if (estimateCost < node.estimateCost) return -1;
         if (estimateCost > node.estimateCost) return 1;
         return 0;
