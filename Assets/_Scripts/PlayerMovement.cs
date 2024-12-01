@@ -3,11 +3,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Stamina))]
 public class PlayerMovement : ValidatedMonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float _walkSpeed;
     [SerializeField] private float _runMultiplier;
+
+    [Header("Stats")]
+    [SerializeField] private int maxStamina = 100;
+    private int currentStamina;
+    [SerializeField, Self] private Stamina stamina;
 
     [Header("Jump")]
     [SerializeField] private float _jumpForce;
@@ -33,6 +39,8 @@ public class PlayerMovement : ValidatedMonoBehaviour
         _characterController = GetComponent<CharacterController>();
         _mainCamera = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
+
+        currentStamina = maxStamina;
 
         _playerInputs.Player.Move.performed += ctx => _moveInput = ctx.ReadValue<Vector2>();
         _playerInputs.Player.Move.canceled += _ => _moveInput = Vector2.zero;
@@ -67,11 +75,28 @@ public class PlayerMovement : ValidatedMonoBehaviour
         horizontalMovement = transform.rotation * horizontalMovement;
         
         HandleGravityAndJump();
+        HandleStaminaUsage(horizontalMovement);
 
         _currentMovement.x = horizontalMovement.x;
         _currentMovement.z = horizontalMovement.z;
         _characterController.Move(_currentMovement * (Time.deltaTime * speedMultiplier));
     }
+
+    private void HandleStaminaUsage(Vector3 movement)
+    {
+        if (movement != Vector3.zero && _isSprintPressed)
+        {
+            currentStamina -= 1;
+        } 
+        else
+        {
+            currentStamina += 1;
+        }
+
+        currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+        stamina.UpdateStamina(currentStamina);
+    }
+
     private void HandleGravityAndJump()
     {
         if (_characterController.isGrounded)

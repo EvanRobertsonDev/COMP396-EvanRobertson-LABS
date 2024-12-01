@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3395567601834952618}
   - component: {fileID: 3205898812229122828}
   - component: {fileID: 2656320178849642950}
+  - component: {fileID: 146365934316699761}
   m_Layer: 9
   m_Name: Player
   m_TagString: Player
@@ -63,6 +64,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -103,7 +107,6 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -158,6 +161,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _walkSpeed: 4
   _runMultiplier: 2
+  maxStamina: 100
+  stamina: {fileID: 146365934316699761}
   _jumpForce: 5
   _gravity: 9.8
   _mouseSensitivity: 0.2
@@ -166,6 +171,20 @@ MonoBehaviour:
   _lookInput: {x: 0, y: 0}
   _isJumpPressed: 0
   _isSprintPressed: 0
+--- !u!114 &146365934316699761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1054041702633037764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 862938e8c4773e9458045766707a301b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxStamina: 0
+  staminaChanel: {fileID: 0}
 --- !u!1 &4588041604255447141
 GameObject:
   m_ObjectHideFlags: 0
